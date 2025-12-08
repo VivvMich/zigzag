@@ -1,7 +1,75 @@
-# Tauri + Vue + TypeScript
+🧩 Générateur de Grilles ZigZag
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Application Desktop Tauri (Rust + Vue)
 
-## Recommended IDE Setup
+Cette application permet de générer automatiquement des grilles de ZigZag (comme dans les magazines type TéléStar), avec sélection intelligente des mots selon leur longueur, leur fréquence dans la langue française et leur rareté naturelle (K, W, X, Z, Q, Y).
+L’objectif : produire des grilles propres, lisibles, équilibrées et jouables, sans croisement de mots.
 
-- [VS Code](https://code.visualstudio.com/) + [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+✨ Fonctionnalités
+
+🖥 Application desktop multiplateforme grâce à Tauri
+
+🎨 Interface moderne en Vue.js
+
+🔤 Sélection intelligente des mots basée sur :
+
+Probabilités par longueur (courts / moyens / longs)
+
+Fréquences réelles des lettres en français
+
+Gestion des lettres rares (K, W, X, Z, Q, Y)
+
+Évitement des mots trop similaires
+
+Prévention des grappes de lettres rares
+
+🧮 Génération d’un chemin ZigZag unique, sans croisement
+
+🧠 Choix automatique d’un mot mystère (non placé dans la grille)
+
+📦 Export / futur : impression PDF, export JSON, sauvegarde de preset
+
+🚀 Rust pour la logique + Vue pour l’UI = rapide, léger, efficace
+
+📐 Logique de sélection des mots (résumé)
+
+Catégories de longueur
+
+Courts : 4–5 lettres
+
+Moyens : 6–8 lettres
+
+Longs : 9–12 lettres
+
+Probabilités globales
+
+Courts : 35 %
+
+Moyens : 45 %
+
+Longs : 20 %
+
+Pondération naturelle par rareté
+Chaque mot reçoit un score basé sur la fréquence naturelle des lettres françaises :
+
+Ultra rares : K, W
+
+Très rares : Z, Y
+
+Rares : X
+
+Peu fréquent : Q
+
+Plus un mot contient de lettres rares, plus sa probabilité d’apparition diminue (jamais supprimée).
+
+Sélection finale d’un mot
+
+Tirage de la longueur
+
+Pondération par rareté naturelle
+
+Validation anti-doublons / anti-grappes
+
+Ajout au chemin ZigZag
+
+Sélection aléatoire du mot mystère (non posé)
