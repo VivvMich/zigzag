@@ -8,30 +8,26 @@ use unicode_normalization::{UnicodeNormalization, char::is_combining_mark};
 pub struct Grid {
     pub height: u8,
     pub width: u8,
-    pub center_hole_height: u8,
-    pub center_hole_width: u8,
     pub letter_cases: Vec<char>,
     pub words: Vec<Option<String>>,
     pub lexicon: Vec<String>,
-}
-
-#[derive(Clone)]
-pub struct GridParam {
-
+    pub letter_probability: HashMap<char, f32>
 }
 
 
 impl Grid {
     pub fn new() -> Grid {
         let lexicon = get_lexicon() ;
+        let mut prob = HashMap::new() ;
+        prob.insert('x', 0.01) ;
+
         Self {
             height: 29,
             width: 31,
-            center_hole_height: 11,
-            center_hole_width: 9,
             letter_cases: vec![],
             words: vec![],
             lexicon: lexicon.unwrap(),
+            letter_probability: prob
         }
     }
 
