@@ -1,13 +1,23 @@
 ﻿use std::collections::HashMap;
 use std::error::Error;
-use std::hash::Hash;
 use csv::Reader;
 use unicode_normalization::{UnicodeNormalization, char::is_combining_mark};
+use rand::{rng, Rng};
+use rand_core::RngCore;
+use rand_xoshiro::rand_core::SeedableRng;
+use rand_xoshiro::Xoroshiro128PlusPlus;
+
+
+const MAX_LETTERS: u32 = 12;
+const MIN_LETTERS: u32 = 5;
+
+
 
 #[derive(Clone)]
 pub struct Grid {
-    pub height: u8,
-    pub width: u8,
+    rng: Xoroshiro128PlusPlus,
+    pub height: u32,
+    pub width: u32,
     pub letter_cases: Vec<char>,
     pub words: Vec<Option<String>>,
     pub lexicon: Vec<String>,
@@ -20,8 +30,11 @@ impl Grid {
         let lexicon = get_lexicon() ;
         let mut prob = HashMap::new() ;
         prob.insert('x', 0.01) ;
+        let seed = rng().next_u64();
+        let rng = Xoroshiro128PlusPlus::seed_from_u64(seed);
 
         Self {
+            rng,
             height: 29,
             width: 31,
             letter_cases: vec![],
@@ -42,13 +55,30 @@ impl Grid {
         separate_words
     }
 
-    // pub fn load_words(&mut self, words_map : HashMap<u8, Vec<String>> ) -> Vec<String> {
-    //     let max_letters = self.height * self.width;
-    //     let budget_letter = 0;
-    //
-    //
-    //
-    // }
+    pub fn load_words(&mut self, words_map : HashMap<u8, Vec<String>> ) -> Vec<String> {
+        let max_letters: u32 = self.height * self.width;
+        let budget_letter:u32 = 0;
+
+        while budget_letter <= max_letters - MAX_LETTERS {
+            let n:u32 = self.rng.random_range(0..=100);
+            let size = self.get_random_size_word();
+
+            match n  {
+
+            }
+        }
+        vec![]
+    }
+
+    fn get_random_size_word(&mut self) -> u32 {
+        let rand_nbr = rng().next_u64() ;
+        match rand_nbr {
+            0..35 => self.rng.random_range(4..=5),
+            35..80 => self.rng.random_range(6..=8),
+            80..100 => self.rng.random_range(9..=12),
+            _=> 0
+        }
+    }
 
 
 
@@ -72,3 +102,4 @@ fn remove_accent_from_str(input: char) -> char {
         .find(|c| !is_combining_mark(*c))
         .unwrap_or('_')
 }
+
