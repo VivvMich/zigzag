@@ -16,13 +16,11 @@ use crate::grid::Grid;
 fn get_words() -> Vec<String> {
     let mut grid = Grid::new();
     grid.create_grid();
-    //let words = grid.words;
+    let words = grid.words;
     //println!("Words: {:?}", words);
-    // let lex : HashMap<(u8, char) ,Vec<String>> = grid.separate_words_by_size_and_letter();
     // let w = lex.get(&(6, 'e')).cloned();
     // w.unwrap_or_else(|| vec![])
-    //words
-    vec![]
+    words
 }
 
 

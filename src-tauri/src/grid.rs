@@ -8,7 +8,7 @@ use rand_xoshiro::rand_core::SeedableRng;
 use rand_xoshiro::Xoroshiro128PlusPlus;
 use crate::letters_prob::LetterProbs;
 
-const MAX_LETTERS: u32 = 12;
+const MAX_NUMBERS_LETTERS: u32 = 12;
 const MIN_LETTERS: u32 = 5;
 
 
@@ -62,39 +62,50 @@ impl Grid {
 
     pub fn load_words(&mut self, words_map : HashMap<(u8, char), Vec<String>>){
         let max_letters: u32 = self.height * self.width;
-        let budget_letter:u32 = 0;
+        let loop_limit_budget = max_letters - MAX_NUMBERS_LETTERS;
+        let mut budget_letter : u32 = 0;
+        print!("WordMap = : {:?} \n", words_map.keys());
+        //print!("Limite de budget : {} \n", loop_limit_budget);
 
         // PROBABILITE //
 
-        let mut letter_probability = LetterProbs::new();
+        let letter_probability = LetterProbs::new();
+
 
         // GENERATION //
 
-        while budget_letter <= max_letters - MAX_LETTERS {
-            let prob_letter:f32 = self.rng.random_range(0.00_f32..=100.00_f32);
-            let length = self.get_random_size_word();
-
+        while budget_letter <= loop_limit_budget {
+            //print!("Budget : {} \n", budget_letter);
             for (ch, threshold) in &letter_probability.list_accumulated {
+                let prob_letter:f32 = self.rng.random_range(0.00_f32..=100.00_f32);
+                let length = self.get_random_size_word();
+
                 if prob_letter <= *threshold {
-                    let wm = words_map.get(&(length, *ch));
+                    //print!("Budget : {:?} \n", (length, ch.to_lowercase().next().unwrap()));
+                    let wm = words_map.get(&(length, ch.to_lowercase().next().unwrap()));
                     if let Some(w) = wm {
                         let len_vec = w.len();
-                        let rand_word = self.rng.random_range(0..len_vec) ;
+                        let rand_word = self.rng.random_range(0..len_vec);
                         let word = &w[rand_word].clone();
+                        //print!("test : {:?} ", word);
                         self.words.push(word.to_string());
+                        budget_letter += length as u32;
                     }
 
-                }
+                    }
+
+
             }
         }
     }
 
     fn get_random_size_word(&mut self) -> u8 {
-        let rand_nbr = rng().next_u64() ;
+        let rand_nbr= self.rng.random_range(0..100);
+        print!("Nbr aléa : {} \n",  rand_nbr);
         match rand_nbr {
             0..35 => self.rng.random_range(4..=5),
             35..80 => self.rng.random_range(6..=8),
-            80..100 => self.rng.random_range(9..=12),
+            80..99 => self.rng.random_range(9..=12),
             _=> 0
         }
     }
