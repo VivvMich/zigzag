@@ -6,7 +6,7 @@ use rand::{rng, Rng};
 use rand_core::RngCore;
 use rand_xoshiro::rand_core::SeedableRng;
 use rand_xoshiro::Xoroshiro128PlusPlus;
-
+use crate::letters_prob::LetterProbs;
 
 const MAX_LETTERS: u32 = 12;
 const MIN_LETTERS: u32 = 5;
@@ -19,7 +19,7 @@ pub struct Grid {
     pub height: u32,
     pub width: u32,
     pub letter_cases: Vec<char>,
-    pub words: Vec<Option<String>>,
+    pub words: Vec<String>,
     pub lexicon: Vec<String>,
     pub letter_probability: HashMap<char, f32>
 }
@@ -44,6 +44,11 @@ impl Grid {
         }
     }
 
+    pub fn create_grid(&mut self) {
+        let separate_index = self.separate_words_by_size_and_letter();
+        self.load_words(separate_index);
+    }
+
     pub fn separate_words_by_size_and_letter(&mut self) -> HashMap<(u8, char) ,Vec<String>> {
         let mut separate_words : HashMap<(u8, char) ,Vec<String>> = HashMap::new();
 
@@ -55,22 +60,36 @@ impl Grid {
         separate_words
     }
 
-    pub fn load_words(&mut self, words_map : HashMap<u8, Vec<String>> ) -> Vec<String> {
+    pub fn load_words(&mut self, words_map : HashMap<(u8, char), Vec<String>>){
         let max_letters: u32 = self.height * self.width;
         let budget_letter:u32 = 0;
 
+        // PROBABILITE //
+
+        let mut letter_probability = LetterProbs::new();
+
+        // GENERATION //
+
         while budget_letter <= max_letters - MAX_LETTERS {
-            let n:u32 = self.rng.random_range(0..=100);
-            let size = self.get_random_size_word();
+            let prob_letter:f32 = self.rng.random_range(0.00_f32..=100.00_f32);
+            let length = self.get_random_size_word();
 
-            match n  {
+            for (ch, threshold) in &letter_probability.list_accumulated {
+                if prob_letter <= *threshold {
+                    let wm = words_map.get(&(length, *ch));
+                    if let Some(w) = wm {
+                        let len_vec = w.len();
+                        let rand_word = self.rng.random_range(0..len_vec) ;
+                        let word = &w[rand_word].clone();
+                        self.words.push(word.to_string());
+                    }
 
+                }
             }
         }
-        vec![]
     }
 
-    fn get_random_size_word(&mut self) -> u32 {
+    fn get_random_size_word(&mut self) -> u8 {
         let rand_nbr = rng().next_u64() ;
         match rand_nbr {
             0..35 => self.rng.random_range(4..=5),
