@@ -62,60 +62,71 @@ impl Grid {
 
     pub fn load_words(&mut self, words_map : HashMap<(u8, char), Vec<String>>){
         let max_letters: u32 = self.height * self.width;
-        let loop_limit_budget = max_letters - MAX_NUMBERS_LETTERS;
+        let limit_budget = max_letters - MAX_NUMBERS_LETTERS;
         let mut budget_letter : u32 = 0;
-        print!("WordMap = : {:?} \n", words_map.keys());
-        //print!("Limite de budget : {} \n", loop_limit_budget);
-
-        // PROBABILITE //
-
         let letter_probability = LetterProbs::new();
+        let accumilated = letter_probability.list_accumulated;
 
 
-        // GENERATION //
+        self.choice_words_with_random_size(&accumilated, &words_map, limit_budget) ;
 
-        while budget_letter <= loop_limit_budget {
-            //print!("Budget : {} \n", budget_letter);
-            for (ch, threshold) in &letter_probability.list_accumulated {
-                let prob_letter:f32 = self.rng.random_range(0.00_f32..=100.00_f32);
-                let length = self.get_random_size_word();
-
-                if prob_letter <= *threshold {
-                    //print!("Budget : {:?} \n", (length, ch.to_lowercase().next().unwrap()));
-                    let wm = words_map.get(&(length, ch.to_lowercase().next().unwrap()));
-                    if let Some(w) = wm {
-                        let len_vec = w.len();
-                        let rand_word = self.rng.random_range(0..len_vec);
-                        let word = &w[rand_word].clone();
-                        //print!("test : {:?} ", word);
-                        self.words.push(word.to_string());
-                        budget_letter += length as u32;
-                    }
-
-                    }
-
-
-            }
-        }
+        // Il reste un mot à mettre
+        let last_len_word: u8 = (max_letters - budget_letter) as u8;
+        self.choice_one_word(&accumilated, &words_map, last_len_word) ;
     }
 
     fn get_random_size_word(&mut self) -> u8 {
         let rand_nbr= self.rng.random_range(0..100);
         print!("Nbr aléa : {} \n",  rand_nbr);
         match rand_nbr {
-            0..35 => self.rng.random_range(4..=5),
-            35..80 => self.rng.random_range(6..=8),
+            0..25 => self.rng.random_range(4..=5),
+            25..80 => self.rng.random_range(6..=8),
             80..99 => self.rng.random_range(9..=12),
             _=> 0
         }
     }
 
+    fn choice_words_with_random_size(&mut self, probability_accumulated:  &Vec<(char, f32)>, words_map : &HashMap<(u8, char), Vec<String>>, limit_budget : u32) {
+        let mut budget_letter = 0;
 
 
+        while budget_letter <= limit_budget {
+            let length = self.get_random_size_word();
+            for (ch, threshold) in probability_accumulated {
+                let prob_letter: f32 = self.rng.random_range(0.00_f32..=100.00_f32);
+                if prob_letter <= *threshold {
+                    let wm = words_map.get(&(length, ch.to_lowercase().next().unwrap()));
+                    if let Some(w) = wm {
+                        let len_vec = w.len();
+                        let rand_word = self.rng.random_range(0..len_vec);
+                        let word = &w[rand_word].clone();
+                        self.words.push(word.to_string());
+                        budget_letter += length as u32;
+                    }
+                }
+            }
+        }
+    }
+
+    fn choice_one_word(&mut self, probability_accumulated:  &Vec<(char, f32)>, words_map : &HashMap<(u8, char), Vec<String>>, length : u8) {
+
+        for (ch, threshold) in probability_accumulated {
+            let prob_letter: f32 = self.rng.random_range(0.00_f32..=100.00_f32);
+            if prob_letter <= *threshold {
+                let wm = words_map.get(&(length, ch.to_lowercase().next().unwrap()));
+                if let Some(w) = wm {
+                    let len_vec = w.len();
+                    let rand_word = self.rng.random_range(0..len_vec);
+                    let word = &w[rand_word].clone();
+                    self.words.push(word.to_string());
+                }
+            }
+        }
+    }
 }
 
 fn get_lexicon() -> Result<Vec<String>, Box<dyn Error>> {
-    let mut reader = Reader::from_path("./lexique.csv")?;
+        let mut reader = Reader::from_path("./lexique.csv")?;
     let mut words : Vec<String> = vec![];
 
     for res in reader.records(){
