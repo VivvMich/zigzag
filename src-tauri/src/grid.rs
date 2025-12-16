@@ -65,14 +65,9 @@ impl Grid {
         let limit_budget = max_letters - MAX_NUMBERS_LETTERS;
         let mut budget_letter : u32 = 0;
         let letter_probability = LetterProbs::new();
-        let accumilated = letter_probability.list_accumulated;
-
-
-        self.choice_words_with_random_size(&accumilated, &words_map, limit_budget) ;
-
-        // Il reste un mot à mettre
-        let last_len_word: u8 = (max_letters - budget_letter) as u8;
-        self.choice_one_word(&accumilated, &words_map, last_len_word) ;
+        let accumulated = letter_probability.list_accumulated;
+        self.choice_words_with_random_size(&accumulated, &words_map, limit_budget) ;
+        get_all_characters_number_of_word(&self.words);
     }
 
     fn get_random_size_word(&mut self) -> u8 {
@@ -88,9 +83,9 @@ impl Grid {
 
     fn choice_words_with_random_size(&mut self, probability_accumulated:  &Vec<(char, f32)>, words_map : &HashMap<(u8, char), Vec<String>>, limit_budget : u32) {
         let mut budget_letter = 0;
-        print!("budget : {} \n",  budget_letter);
 
-        while budget_letter <= limit_budget {
+        loop {
+
             let length = self.get_random_size_word();
             for (ch, threshold) in probability_accumulated {
                 let prob_letter: f32 = self.rng.random_range(0.00_f32..=100.00_f32);
@@ -103,6 +98,13 @@ impl Grid {
                         self.words.push(word.to_string());
                         budget_letter += length as u32;
                         print!("budget : {} \n",  budget_letter);
+                        print!("Budget >= Limite du budget -------> {} >= {} \n",  budget_letter, limit_budget);
+                        if budget_letter >= limit_budget {
+                            let rest = (budget_letter - limit_budget) as u8;
+                            if rest == 0 { return; }
+                            self.choice_one_word(&probability_accumulated, &words_map, rest);
+                            return;
+                        }
                     }
                 }
             }
@@ -145,3 +147,10 @@ fn remove_accent_from_str(input: char) -> char {
         .unwrap_or('_')
 }
 
+fn get_all_characters_number_of_word(words: &Vec<String>) {
+    let total: usize = words.iter()
+        .map(|s| s.chars().filter(|c| *c != ' ').count())
+        .sum();
+
+    println!("Nombre total de caractères (sans espaces) : {}", total);
+}
