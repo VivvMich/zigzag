@@ -88,7 +88,7 @@ impl Grid {
 
     fn choice_words_with_random_size(&mut self, probability_accumulated:  &Vec<(char, f32)>, words_map : &HashMap<(u8, char), Vec<String>>, limit_budget : u32) {
         let mut budget_letter = 0;
-
+        print!("budget : {} \n",  budget_letter);
 
         while budget_letter <= limit_budget {
             let length = self.get_random_size_word();
@@ -102,6 +102,7 @@ impl Grid {
                         let word = &w[rand_word].clone();
                         self.words.push(word.to_string());
                         budget_letter += length as u32;
+                        print!("budget : {} \n",  budget_letter);
                     }
                 }
             }

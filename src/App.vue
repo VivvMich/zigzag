@@ -1,36 +1,19 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import {invoke} from "@tauri-apps/api/core";
 
-const gretMsg = ref("");
-// const name = ref("");
-
-const rows = ref([])
+const rows = ref([]);
+const words = ref<string[]>([])
 
 function generateTable() {
   const width = 31
   const height = 29
-
-  const holeW = 9
-  const holeH = 11
-
-  // marges calculées
-  const marginX = Math.floor((width - holeW) / 2)   // 11
-  const marginY = Math.floor((height - holeH) / 2)  // 9
-
   const table = []
 
   for (let y = 0; y < height; y++) {
     const row = []
-
     for (let x = 0; x < width; x++) {
-      const insideHole =
-          y >= marginY &&
-          y < marginY + holeH &&
-          x >= marginX &&
-          x < marginX + holeW
-
-      row.push(insideHole ? "" : "#")
+      row.push("#")
     }
 
     table.push(row)
@@ -44,8 +27,12 @@ async function getWords(): Promise<string[]> {
    return words;
 }
 
-getWords();
-generateTable();
+onMounted( async() => {
+  getWords();
+  generateTable();
+  words.value = await getWords();
+})
+
 </script>
 
 <template>
@@ -53,102 +40,7 @@ generateTable();
     <h1>Générateur de mot en vrac</h1>
     <div class="word-list">
       <ul>
-        <li>Lorem.</li>
-        <li>Aliquid.</li>
-        <li>Velit.</li>
-        <li>Expedita.</li>
-        <li>Totam!</li>
-        <li>Cum.</li>
-        <li>Qui.</li>
-        <li>Molestiae.</li>
-        <li>Deserunt!</li>
-        <li>Laudantium?</li>
-        <li>Porro.</li>
-        <li>Consectetur!</li>
-        <li>Voluptas?</li>
-        <li>Cumque!</li>
-        <li>Consequatur.</li>
-        <li>Molestias!</li>
-        <li>Culpa!</li>
-        <li>Nemo.</li>
-        <li>Tempora?</li>
-        <li>Voluptatem!</li>
-        <li>Nesciunt?</li>
-        <li>Dolorum!</li>
-        <li>Exercitationem!</li>
-        <li>Doloremque?</li>
-        <li>Cum!</li>
-        <li>Culpa.</li>
-        <li>Et.</li>
-        <li>Nesciunt!</li>
-        <li>Optio!</li>
-        <li>Labore.</li>
-        <li>Ipsum!</li>
-        <li>Delectus.</li>
-        <li>Rerum.</li>
-        <li>Iste?</li>
-        <li>Incidunt?</li>
-        <li>Molestiae.</li>
-        <li>Libero.</li>
-        <li>Eaque?</li>
-        <li>Quidem.</li>
-        <li>Ducimus.</li>
-        <li>Inventore.</li>
-        <li>Error.</li>
-        <li>Pariatur.</li>
-        <li>Facere.</li>
-        <li>Ab!</li>
-        <li>Harum.</li>
-        <li>Maxime.</li>
-        <li>Assumenda?</li>
-        <li>Animi?</li>
-        <li>At.</li>
-        <li>Qui?</li>
-        <li>Doloribus.</li>
-        <li>Vitae?</li>
-        <li>Corporis!</li>
-        <li>Laborum.</li>
-        <li>Dolorem.</li>
-        <li>Architecto?</li>
-        <li>Nemo.</li>
-        <li>Sint!</li>
-        <li>Porro!</li>
-        <li>Saepe!</li>
-        <li>Quidem.</li>
-        <li>Dolores!</li>
-        <li>Commodi.</li>
-        <li>Nihil.</li>
-        <li>Illum?</li>
-        <li>Quis!</li>
-        <li>Sapiente.</li>
-        <li>Dolorem?</li>
-        <li>Porro!</li>
-        <li>Cumque.</li>
-        <li>Impedit.</li>
-        <li>Odit!</li>
-        <li>Perspiciatis?</li>
-        <li>Adipisci.</li>
-        <li>Quam?</li>
-        <li>Ut!</li>
-        <li>Consequatur.</li>
-        <li>Quaerat.</li>
-        <li>Accusamus.</li>
-        <li>Optio.</li>
-        <li>Laborum?</li>
-        <li>Modi.</li>
-        <li>Maxime.</li>
-        <li>Placeat.</li>
-        <li>Aspernatur?</li>
-        <li>Labore!</li>
-        <li>Veniam!</li>
-        <li>Molestiae?</li>
-        <li>Illo.</li>
-        <li>Reprehenderit.</li>
-        <li>Culpa?</li>
-        <li>Nobis.</li>
-        <li>Mollitia.</li>
-        <li>Recusandae.</li>
-        <li>Maxime?</li>
+       <li v-for="word in words" :key="word">{{ word }}</li>
       </ul>
     </div>
 
