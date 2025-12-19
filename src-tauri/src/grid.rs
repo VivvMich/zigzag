@@ -95,9 +95,10 @@ impl Grid {
                         let len_vec = w.len();
                         let rand_word = self.rng.random_range(0..len_vec);
                         let word = &w[rand_word].clone();
+                        print!("Mot : {}, taille : {} \n",  &word, &word.len());
+                        assert_eq!(word.len(), length as usize, "Mot invalide: {}", &word);
                         self.words.push(word.to_string());
                         budget_letter += length as u32;
-                        print!("budget : {} \n",  budget_letter);
                         print!("Budget >= Limite du budget -------> {} >= {} \n",  budget_letter, limit_budget);
                         if budget_letter >= limit_budget {
                             let rest = (budget_letter - limit_budget) as u8;
@@ -149,7 +150,7 @@ fn remove_accent_from_str(input: char) -> char {
 
 fn get_all_characters_number_of_word(words: &Vec<String>) {
     let total: usize = words.iter()
-        .map(|s| s.chars().filter(|c| *c != ' ').count())
+        .map(|s| s.len())
         .sum();
 
     println!("Nombre total de caractères (sans espaces) : {}", total);
