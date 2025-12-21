@@ -16,7 +16,7 @@ use tauri::{Window, LogicalSize, Manager, Size};
 #[tauri::command]
 fn get_words() -> Vec<String> {
     let mut grid = Grid::new();
-    grid.create_grid();
+    grid.init();
     let words = grid.words;
     //println!("Words: {:?}", words);
     // let w = lex.get(&(6, 'e')).cloned();
